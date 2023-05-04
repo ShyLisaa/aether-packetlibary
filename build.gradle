@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+group = 'de.princessheaven.aether'
+version = '1.1.0-RC1'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.netty:netty-all:4.1.91.Final'
+    implementation 'it.unimi.dsi:fastutil:8.5.11'
+}
+
+configurations.implementation.setCanBeResolved(true)
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from {
+        configurations.implementation.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url 'https://repository.haizon.de/private'
+            credentials {
+                username = project.hasProperty("mavenUser") ? project.property("mavenUser") : ""
+                password = project.hasProperty("mavenPassword") ? project.property("mavenPassword") : ""
+            }
+        }
+    }
+}
